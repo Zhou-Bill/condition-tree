@@ -1,0 +1,111 @@
+.condition-container {
+  position: relative;
+
+  .condition-list {
+    
+    .condition-list-item {
+      padding-left: 90px;
+      min-height: 32px;
+      position: relative;
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 42px;
+        transform: translateY(-50%);
+        width: 2px;
+        height: calc(100% + 18px);
+        background-color: red;
+      }
+
+      .condition-list-item-content {
+        padding: 0 12px;
+        border: 1px dashed #ccc;
+        display: flex;
+        align-items: center;
+
+        .condition-list-item-content-action,
+        .condition-list-item-content-value {
+          display: flex;
+          align-items: center;
+        }
+
+        .condition-list-item-content-action {
+          margin-left: 58px;
+        }
+      }
+    }
+
+    .condition-list-item:first-child {
+      &::before {
+        background-color: red;
+        height: 100%;
+        top: 50%;
+        transform: translateY(0);
+        // display: none;
+      }
+
+      &::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 42px;
+        transform: translateY(-50%);
+        width: 32px;
+        height: 2px;
+        background-color: red;
+      }
+    }
+    .condition-list-item:last-child {
+      margin-bottom: 0px;
+      &::before {
+        background-color: red;
+        height: 100%;
+        top: 50%;
+        transform: translateY(-100%);
+      }
+
+      &::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 42px;
+        transform: translateY(-50%);
+        width: 32px;
+        height: 2px;
+        background-color: red;
+      }
+    }
+
+    .condition-list-item-box {
+      border: 1px dashed #ccc;
+      padding: 12px
+    }
+  }
+
+  .condition-action {
+    width: 64px;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 32px;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+}
+
+.condition-operation {
+  padding-left: 42px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
