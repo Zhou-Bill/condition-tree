@@ -1,22 +1,25 @@
+import { omit } from "lodash-es";
+import { ConditionType, Options } from "./data";
 
-class Node<T> {
+class Node<T, P> {
     val: T
-    child: Node<T>[]
-    parent: Node<T> | null
-    constructor(val?: T, child? : Node<T>, parent? : Node<T>) {
+    child: Node<T, P>[]
+    parent: Node<T, P> | null
+    constructor(val?: T, parent? : Node<T, P>) {
       this.val = val as T;
       this.child = [];
       this.parent = (parent === undefined ? null : parent);
     }
 }
 
-const dataTraverseToTree = (data: any) => {
-  const root = new Node<string>("root")
+const dataTraverseToTree = (data: ConditionType) => {
+  const root = new Node<string, string>("root")
   const treeNodeMap = new Map()
 
-  const traverse = (node: any, parent: any) => {
-    const { nodes, ...rest } = node
-    const treeNode = new Node(rest, undefined, parent)
+  const traverse = (node: ConditionType | Options, parent: any) => {
+    const nodes = (node as ConditionType).nodes || []
+    const rest = omit(node, ['nodes'])
+    const treeNode = new Node<ConditionType | Options, ConditionType | Options>(rest as ConditionType | Options, parent)
     treeNodeMap.set(rest.key, treeNode)
 
     parent.child.push(treeNode)

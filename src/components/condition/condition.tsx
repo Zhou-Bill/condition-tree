@@ -1,97 +1,113 @@
+import { ConditionType, Options } from './data'
 import './index.less'
+import { Node } from './tree'
+import classNames from 'classnames'
 
-export type Options = {
-  /**  */
-  key: string,
-  type: 'node' & string
-  action?: ('===' | 'like' | 'in' | '<=' | '>=' | '<' | '>' | '!=' | 'between'),
-  value: string,
-}
-
-type ConditionType = {
-  /** node => 节点 group => 节点组 */
-  type: ('group') & string
-  value: ('AND' | 'OR') & string,
-  key: string,
-  nodes: (Options | ConditionType)[]
+export type ConditionsType = {
+  val: Options | ConditionType
+  child: Node<(Options | ConditionType), (Options | ConditionType)>[]
+  parent: Node<Options | ConditionType, (Options | ConditionType)> | null
 }
 
 interface ConditionProps {
-  conditions: ConditionType
+  conditions: ConditionsType
   path?: string
-  onAdd?: (path: string) => void
-  onRemove?: (path: string) => void
+  onRemove?: (node: Node<Options | ConditionType, Options | ConditionType>) => void
+  onAddNext?: (node: Node<Options | ConditionType, Options | ConditionType>) => void
+  onAddGroup?: (node: Node<Options | ConditionType, Options | ConditionType>) => void
 }
 const Conditions = (props: ConditionProps) => {
-  const { conditions, path = '', onAdd } = props
+  const { conditions, path = '', onAddNext, onRemove, onAddGroup } = props
 
-  const handleAppend = (path: string) => {
-    onAdd?.(path)
+  const handleAppend = (node: Node<Options | ConditionType, Options | ConditionType>) => {
+    onAddGroup?.(node)
   }
 
   /**
    * path 已 . 分割的路径
    * @param path 1.1  // 1.1.1
    */
-  const handleAddOption = (path: string) => {
-    console.log(123123, path)
-    onAdd?.(path)
+  const handleAddOption = (node: Node<Options | ConditionType, Options | ConditionType>) => {
+    onAddNext?.(node)
   }
 
-  const renderConditionNode = (record: Options, path: string) => {
+  const handleRemove = (node: Node<Options | ConditionType, Options | ConditionType>) => {
+    onRemove?.(node)
+  }
+
+  const renderConditionNode = (record: Node<Options, Options>, path: string) => {
     return (
       <div className='condition-list-item-content'>
         <div>{path}. </div>
         <div className='condition-list-item-content-value'>
-          <div>{record.key}</div>
-          <div>{record.action}</div>
-          <div>{record.value as string}</div>
+          <div>{record.val.key}</div>
+          {/* <div>{record.action}</div>
+          <div>{record.value as string}</div> */}
         </div>
         <div className='condition-list-item-content-action'>
-          <div onClick={() => handleAddOption(path)}>+</div>
-          <div>-</div>
+          <div onClick={() => handleAddOption(record)}>+</div>
+          <div onClick={() => handleRemove(record)}>-</div>
         </div>
       </div>
     )
   }
 
-  const renderNode = (_item: Options | ConditionType, path: string) => {
-    if (_item.type === 'group') {
+  const renderNode = (_item: Node<Options | ConditionType, Options | ConditionType>, path: string) => {
+    if (_item.val.type === 'group') {
       return (
         <Conditions 
           key={path}
           conditions={_item} 
           path={path} 
-          onAdd={handleAddOption}
+          onAddNext={handleAddOption}
+          onRemove={handleRemove}
+          onAddGroup={handleAppend}
         />
       )
     }
 
-    return renderConditionNode(_item as Options, path) 
+    return renderConditionNode(_item as Node<Options, Options>, path) 
+  }
+
+  if (conditions?.child?.length === 0) {
+    console.log(conditions)
+    return null
+
   }
 
   return (
     <div style={{border: '1px solid #ccc', padding: '12px'}}>
+      <div>{conditions.val.key}</div>
       <div className='condition-container'>
         <div className='condition-list'>
           {
-            conditions.nodes.map((_item, _index) => {
+            conditions?.child?.map((_item, _index) => {
               return (
-                <div className='condition-list-item' key={_item.key || _index}>
+                <div className={classNames('condition-list-item', {
+                  'condition-list-item-only': conditions.child.length === 1
+                })} key={_item.val.key || _index}>
                   {renderNode(_item, `${path ? `${path}.` : ''}${_index}`)}
                 </div>
               )
             })
           }
         </div>
-        <div className='condition-action'>
-          <div>{conditions.value}</div>
-        </div>
+        {
+          conditions?.child.length > 0 && (
+            <div className='condition-action'>
+              <div>{conditions?.val?.value}</div>
+            </div>
+          )
+        }
       </div>
-      <div className='condition-operation'>
-        <div onClick={() => handleAppend(path)}>+</div>
-        <div>-</div>
-      </div>
+      {
+        conditions?.child.length > 0 && (
+          <div className='condition-operation'>
+            <div onClick={() => handleAppend(conditions)}>+</div>
+            <div onClick={() => handleRemove(conditions)}>-</div>
+          </div>
+        )
+      }
     </div>
   )
 }

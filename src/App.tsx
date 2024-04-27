@@ -6,18 +6,21 @@ import { data } from './components/condition/data'
 console.log(codeGenerator(transformer(parser(tokenized("AND(A,B,OR(C,D,E))")))))
 console.log(codeGenerator(transformer(parser(tokenized("OR(AND(A,B,OR(C,D,E,AND(F,G))),I,OR(AND(A,B,C),D,E))")))))
 
-console.log(dataTraverseToTree(data))
-const { treeNodeMap, root } = dataTraverseToTree(data)
+console.log(transformer(parser(tokenized("AND(A,B,OR(C,D,E))"))))
+console.log((parser(tokenized("AND(A,B,OR(C,D,E))"))))
 
-const res = treeNodeMap.get('root')
-res.child.push(new Node({
-  key: 'A' + Math.random().toString(36).substring(7),
-  action: '===' as const,
-  value: '1',
-  type: 'node' as const,
-}, undefined, res))
-console.log(root.child[0])
-console.log(res)
+console.log(dataTraverseToTree(data))
+// const { treeNodeMap, root } = dataTraverseToTree(data)
+
+// const res = treeNodeMap.get('root')
+// res.child.push(new Node({
+//   key: 'A' + Math.random().toString(36).substring(7),
+//   action: '===' as const,
+//   value: '1',
+//   type: 'node' as const,
+// }, undefined, res))
+// console.log(root.child[0])
+// console.log(res)
 
 function App() {
 

@@ -1,4 +1,20 @@
-export const data = {
+export type Options = {
+  /**  */
+  key: string,
+  type: 'node' & string
+  action?: ('===' | 'like' | 'in' | '<=' | '>=' | '<' | '>' | '!=' | 'between'),
+  value: string,
+}
+
+export type ConditionType = {
+  /** node => 节点 group => 节点组 */
+  type: ('group') & string
+  value: ('AND' | 'OR') & string,
+  key: string,
+  nodes: (Options | ConditionType)[]
+}
+
+export const data: ConditionType = {
   key: 'root',
   type: 'group' as const,
   value: 'OR' as const,
