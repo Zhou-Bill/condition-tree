@@ -1,6 +1,6 @@
 import { tokenized, parser, transformer, codeGenerator } from './utils'
 import { ConditionsContainer } from './components/condition'
-import { dataTraverseToTree, Node } from './components/condition/tree'
+import { dataTraverseToTree } from './components/condition/tree'
 import { data } from './components/condition/data'
 
 console.log(codeGenerator(transformer(parser(tokenized("AND(A,B,OR(C,D,E))")))))
