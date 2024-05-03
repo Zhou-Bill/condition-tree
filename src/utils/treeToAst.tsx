@@ -70,4 +70,47 @@ const treeToAst = (tree: Node<Options | ConditionType, Options | ConditionType>)
 
   return result
 }
+
+/**
+ * AST to Tree
+ */
+
+export const astToTree = (ast) => {
+  const result = new Node<string, null>('root')
+  console.log(ast)
+  const treeNodeMap = new Map()
+
+  function walk (astTree: any, parent: Node<string, null> | null) {
+    if (astTree.type === 'CallExpression') {
+      const node = new Node<ConditionType | Options, ConditionType | Options>({
+        key: astTree.key,
+        value: astTree.value,
+        type: 'group',
+      } as ConditionType | Options, parent as any)
+      // treeNodeMap.set(astTree.value, node)
+
+      parent?.child.push(node)
+      astTree.params.forEach((child: any) => {
+        walk(child, node)
+      })
+
+    } else {
+      const node = new Node({
+        key: astTree.key,
+        value: astTree.value,
+        type: 'node',
+      } as ConditionType | Options, parent as any)
+      treeNodeMap.set(astTree.value, node)
+
+      parent?.child.push(node)
+    }
+  }
+  walk(ast.body[0], result)
+  return {
+    root: result,
+    treeNodeMap
+  }
+}
+
+
 export default treeToAst

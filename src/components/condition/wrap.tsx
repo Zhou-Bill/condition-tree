@@ -7,9 +7,11 @@ import { codeGenerator, transformer } from "../../utils";
 
 const WrapComponent = () => {
   const [conditionData, setConditionOptions] = useState(() => dataTraverseToTree(data))
+  const [conditionRes, setConditionRes] = useState<string>('')
+
   const handleAppend = (node: Node<Options | ConditionType, Options | ConditionType>) => {
     const temp = {
-      key: 'APPEND' + Math.random().toString(36).substring(7),
+      key: Math.random().toString(36).substring(7),
       action: '===' as const,
       value: '1',
       type: 'node' as const,
@@ -34,13 +36,13 @@ const WrapComponent = () => {
     const groupNodes = [
       {
         type: 'node' as const,
-        key: 'Axxxx',
+        key: Math.random().toString(36).substring(7),
         action: '===' as const,
         value: '1',
       }, 
       {
         type: 'node' as const,
-        key: 'Bxxx',
+        key: Math.random().toString(36).substring(7),
         action: 'like' as const,
         value: '2',
       },
@@ -91,12 +93,11 @@ const WrapComponent = () => {
 
   const onExport = () => {
     const result = treeToAst(conditionData.root as unknown as Node<Options | ConditionType, Options | ConditionType>)
-    console.log(result)
-    console.log(codeGenerator(transformer(result)))
+    // console.log(result)
+    // console.log(codeGenerator(transformer(result)))
+    setConditionRes(codeGenerator(transformer(result)))
 
   }
-
-  console.log(conditionData)
 
   return (
     <div>
@@ -107,6 +108,7 @@ const WrapComponent = () => {
         onRemove={handleRemove}
         onAddGroup={handleAddGroup}
       /> 
+      <div>{conditionRes}</div>
       <div onClick={onExport}>导出</div>
     </div>
   )
