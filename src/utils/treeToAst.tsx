@@ -21,6 +21,7 @@
 //   ]
 // }
 
+import { ProgramNode } from ".";
 import { ConditionType, Options } from "../components/condition/data";
 import { Node } from "../components/condition/tree";
 
@@ -75,8 +76,8 @@ const treeToAst = (tree: Node<Options | ConditionType, Options | ConditionType>)
  * AST to Tree
  */
 
-export const astToTree = (ast) => {
-  const result = new Node<string, null>('root')
+export const astToTree = (ast: ProgramNode) => {
+  const result = new Node<any, null>('root')
   console.log(ast)
   const treeNodeMap = new Map()
 

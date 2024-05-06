@@ -103,7 +103,7 @@ type StringLiteralNode = {
   value: string
 }
 
-type ProgramNode = {
+export type ProgramNode = {
   type: 'Program',
   body: (StringLiteralNode | CallExpressionNode)[]
   _context?: (StringLiteralNode | CallExpressionNode)[]
@@ -111,9 +111,14 @@ type ProgramNode = {
 
 type CallExpressionNode = {
   type: 'CallExpression',
-  value: string,
-  params: (StringLiteralNode | CallExpressionNode)[]
-  _context?: (StringLiteralNode | CallExpressionNode)[]
+  value?: string,
+  params?: (StringLiteralNode | CallExpressionNode)[]
+  callee?: {
+    type: string,
+    name: string,
+  },
+  arguments?: any,
+  _context?: (StringLiteralNode | CallExpressionNode | ExpressionStatementNode)[]
 }
 
 type ExpressionStatementNode = {
@@ -129,7 +134,7 @@ type ExpressionStatementNode = {
 }
 
 type VisitorType<ChildNode, ParentNode> = {
-  enter: (node: ChildNode, parent: ParentNode) => void,
+  enter?: (node: ChildNode, parent: ParentNode) => void,
   exit?: (node: ChildNode, parent: ParentNode) => void
 }
 
@@ -157,7 +162,7 @@ export function parser(tokens: TokenType[]) {
       while (token.type !== 'paren' || (token.type === 'paren' && token.value !== ')')) {
         const nextNode = walk()
         if (nextNode) {
-          node.params.push(nextNode)
+          node.params!.push(nextNode)
         }
         token = tokens[current]
       }
@@ -201,7 +206,7 @@ function traverser(ast: ProgramNode, visitor: VisitorMethodType) {
 
   function traverseNode(node: CallExpressionNode | StringLiteralNode | ProgramNode, parent: ProgramNode | CallExpressionNode | StringLiteralNode | null) {
 
-    const methods = visitor[node.type as keyof VisitorMethodType] ;
+    const methods = visitor[node.type as keyof VisitorMethodType] as VisitorType<CallExpressionNode | StringLiteralNode | ProgramNode, ProgramNode | CallExpressionNode | StringLiteralNode | null>;
 
     if (methods && methods.enter) {
       methods.enter(node, parent);
@@ -213,7 +218,7 @@ function traverser(ast: ProgramNode, visitor: VisitorMethodType) {
         break;
 
       case 'CallExpression':
-        traverseArray(node.params, node);
+        traverseArray(node.params!, node);
         break;
 
       case 'StringLiteral':
@@ -224,7 +229,7 @@ function traverser(ast: ProgramNode, visitor: VisitorMethodType) {
     }
 
     if (methods && methods.exit) {
-      methods.exit(node as any, parent);
+      methods.exit(node, parent);
     }
   }
 
@@ -253,11 +258,11 @@ export function transformer(ast: ProgramNode) {
     CallExpression: {
       enter(node, parent) {
 
-        let expression = {
+        let expression: CallExpressionNode | ExpressionStatementNode = {
           type: 'CallExpression',
           callee: {
             type: 'Identifier',
-            name: node.value,
+            name: node.value!,
           },
           arguments: [],
         };
@@ -272,7 +277,7 @@ export function transformer(ast: ProgramNode) {
           } as unknown as ExpressionStatementNode;
         }
 
-        parent?._context!.push(expression);
+        parent?._context!.push(expression as CallExpressionNode);
       },
     }
   });
@@ -280,7 +285,7 @@ export function transformer(ast: ProgramNode) {
   return newAst;
 }
 
-export function codeGenerator(node: any) {
+export function codeGenerator(node: any): string {
 
   switch (node.type) {
 
