@@ -90,9 +90,9 @@ export const astToTree = (ast: ProgramNode) => {
       } as ConditionType | Options, parent as any)
       // treeNodeMap.set(astTree.value, node)
 
-      parent?.child.push(node)
+      parent?.child.push(node as any)
       astTree.params.forEach((child: any) => {
-        walk(child, node)
+        walk(child, node as any)
       })
 
     } else {
@@ -103,7 +103,7 @@ export const astToTree = (ast: ProgramNode) => {
       } as ConditionType | Options, parent as any)
       treeNodeMap.set(astTree.value, node)
 
-      parent?.child.push(node)
+      parent?.child.push(node as any)
     }
   }
   walk(ast.body[0], result)
